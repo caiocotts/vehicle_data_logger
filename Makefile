@@ -1,11 +1,21 @@
-vdl: vdl.o
-	c++ vdl.o -o vdl
+vdl: vdl.o logger.o serial.o nmea.o dlgps.o
+	c++ -lm vdl.o logger.o serial.o nmea.o dlgps.o -o vdl
+	
+vdl.o: vdl.cpp vdl.h logger.h serial.h nmea.h dlgps.h
+	c++ vdl.cpp -c
 
-vdl.o: vdl.cpp
-	c++ -c vdl.cpp
+logger.o: logger.cpp logger.h serial.h nmea.h dlgps.h
+	c++ logger.cpp -c 
 
-refman:
-	doxygen ceng252
+serial.o: serial.cpp serial.h
+	c++ serial.cpp -c 
 
+dlgps.o: dlgps.cpp dlgps.h
+	c++ dlgps.cpp -c 
+
+nmea.o: nmea.cpp nmea.h
+	c++ nmea.cpp -c 
+        
 clean:
-	rm -rf *.o rtf
+	touch *
+	rm -rf *.o rtf 
