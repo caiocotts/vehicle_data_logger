@@ -5,6 +5,7 @@
  */
 
 #include "logger.h"
+#include "sensehat.h"
 #include <cinttypes>
 #include <cstdlib>
 #include <fstream>
@@ -12,6 +13,9 @@
 #include <regex>
 #include <string>
 #include <unistd.h>
+
+// Global Objects
+SenseHat sh;
 
 using namespace std;
 
@@ -39,6 +43,25 @@ string DlGetSerial(void) {
 reading_s DlGetLoggerReadings(void) {
   reading_s creads{0};
   creads.rtime = time(NULL);
+
+#if SENSEHAT
+  creads.temperature = sh.GetTemperature();
+  creads.humidity = sh.GetHumidity();
+  creads.pressure = sh.GetPressure();
+  sh.GetAcceleration(creads.xa, creads.ya, creads.za);
+  usleep(IMUDELAY);
+  sh.GetOrientation(creads.pitch, creads.roll, creads.yaw);
+  usleep(IMUDELAY);
+  sh.GetMagnetism(creads.xm, creads.ym, creads.zm);
+  usleep(IMUDELAY);
+  creads.latitude = DLAT;
+  creads.longitude = DLONG;
+  creads.altitude = DALT;
+  creads.speed = DSPEED;
+  creads.heading = DHEADING;
+
+#else
+
   creads.temperature = DTEMP;
   creads.humidity = DHUMID;
   creads.pressure = DPRESS;
@@ -57,15 +80,17 @@ reading_s DlGetLoggerReadings(void) {
   creads.speed = DSPEED;
   creads.heading = DHEADING;
 
+#endif
+
   return creads;
 }
 
 void DlDisplayLoggerReadings(reading_s lreads) {
   cout << "Unit: " << DlGetSerial();
   printf(" %s\n", ctime(&lreads.rtime));
-  printf("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fPa\n", lreads.temperature,
+  printf("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fkPa\n", lreads.temperature,
          lreads.humidity, lreads.pressure);
-  printf("Xa: %fg\t\tYa: %fg\t\tZa: %f\n", lreads.xa, lreads.ya, lreads.za);
+  printf("Xa: %fg\t\tYa: %fg\t\tZa: %fg\n", lreads.xa, lreads.ya, lreads.za);
   printf("Pitch: %f\tRoll: %f\t\tYaw: %f\n", lreads.pitch, lreads.roll,
          lreads.yaw);
   printf("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
@@ -75,6 +100,6 @@ void DlDisplayLoggerReadings(reading_s lreads) {
 }
 
 int DlSaveLoggerData(reading_s creads) {
-  puts("Saving Logger Data");
+  puts("Saving Logger Data\n");
   return 0;
 }

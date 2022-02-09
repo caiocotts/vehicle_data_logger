@@ -30,6 +30,8 @@ using namespace std;
 #define DHEADING 320
 #define SEARCHSTR "serial\t\t:"
 #define SYSINFOBUSZ 512
+#define SENSEHAT 1
+#define IMUDELAY 200000
 
 struct reading_s {
   time_t rtime;      ///< Reading time

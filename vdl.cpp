@@ -17,9 +17,7 @@ using namespace std;
  */
 int main() {
   while (true) {
-    // cout << "Caio's CENG252 Vehicle Data Logger\n";
     reading_s reads = DlGetLoggerReadings();
-    // cout << reads.longitude;
     DlDisplayLoggerReadings(reads);
     DlSaveLoggerData(reads);
     sleep(5);
