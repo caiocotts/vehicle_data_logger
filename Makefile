@@ -1,5 +1,5 @@
 vdl: vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o
-	c++ vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o -lm -lRTIMULib -o vdl
+	c++ vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o -lm -lRTIMULib -lncurses -o vdl
 	
 vdl.o: vdl.cpp vdl.h logger.h serial.h nmea.h dlgps.h
 	c++ vdl.cpp -c
@@ -18,6 +18,9 @@ nmea.o: nmea.cpp nmea.h
 
 sensehat.o: sensehat.cpp sensehat.h
 	c++ sensehat.cpp -c
+
+refman:
+	doxygen ceng252	
         
 clean:
 	touch *

@@ -57,7 +57,7 @@ struct reading_s {
 // Function Prototypes
 ///\cond INTERNAL
 int DlInitialization(void);
-string DlGetSerial(void);
+uint64_t DlGetSerial(void);
 reading_s DlGetLoggerReadings(void);
 void DlDisplayLoggerReadings(reading_s lreads);
 int DlSaveLoggerData(reading_s creads);

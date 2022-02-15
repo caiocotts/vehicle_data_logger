@@ -1,45 +1,57 @@
-/** @file logger.h
- *  @brief Logger constants, structs, and function types.
+/** @file logger.cpp
+ *  @brief Logger functions.
  *  @author Caio Cotts
- *  @date  24 jan 22
+ *  @date Feb 14 2022
  */
 
 #include "logger.h"
 #include "sensehat.h"
-#include <cinttypes>
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <ncurses.h>
 #include <regex>
 #include <string>
-#include <unistd.h>
 
 // Global Objects
 SenseHat sh;
 
 using namespace std;
 
+/** @brief Initialize data logger.
+ *  @author Caio Cotts
+ *  @date Feb 14 2022
+ *  @return 0 if initialization successful.
+ */
 int DlInitialization(void) {
-  cout << "Caio Cotts' CENG252 Vehicle Data Logger\n";
-  cout << "Data Logger Initialization\n\n";
+  printw("Caio Cotts' CENG252 Vehicle Data Logger\n");
+  printw("Data Logger Initialization\n\n");
   return 0;
 }
 
-string DlGetSerial(void) {
+/** @brief Get serial number of the Raspberry Pi.
+ *  @author Caio Cotts
+ *  @date Feb 14 2022
+ *  @return Unsigned long long
+ */
+uint64_t DlGetSerial(void) {
   regex rgx("Serial.+: ([0-9]+)");
   smatch match;
   FILE *fp;
-  ifstream t;
+  ifstream t("/proc/cpuinfo");
   stringstream buffer;
-  t.open("/proc/cpuinfo");
   buffer << t.rdbuf();
   string buf = buffer.str();
-
   regex_search(buf, match, rgx);
+  uint64_t serial = stoull(match.str(1));
 
-  return match.str(1);
+  return serial;
 }
 
+/** @brief Get sensor readings.
+ *  @author Caio Cotts
+ *  @date Feb 14 2022
+ *  @return reading_s object
+ */
 reading_s DlGetLoggerReadings(void) {
   reading_s creads{0};
   creads.rtime = time(NULL);
@@ -85,21 +97,31 @@ reading_s DlGetLoggerReadings(void) {
   return creads;
 }
 
+/** @brief Print sensor readings to standard out.
+ *  @author Caio Cotts
+ *  @date Feb 14 2022
+ *  @return void
+ */
 void DlDisplayLoggerReadings(reading_s lreads) {
-  cout << "Unit: " << DlGetSerial();
-  printf(" %s\n", ctime(&lreads.rtime));
-  printf("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fkPa\n", lreads.temperature,
+  printw("Unit: %Li", DlGetSerial());
+  printw(" %s\n", ctime(&lreads.rtime));
+  printw("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fkPa\n", lreads.temperature,
          lreads.humidity, lreads.pressure);
-  printf("Xa: %fg\t\tYa: %fg\t\tZa: %fg\n", lreads.xa, lreads.ya, lreads.za);
-  printf("Pitch: %f\tRoll: %f\t\tYaw: %f\n", lreads.pitch, lreads.roll,
+  printw("Xa: %fg\t\tYa: %fg\t\tZa: %fg\n", lreads.xa, lreads.ya, lreads.za);
+  printw("Pitch: %f\tRoll: %f\t\tYaw: %f\n", lreads.pitch, lreads.roll,
          lreads.yaw);
-  printf("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
-  printf("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
+  printw("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
+  printw("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
          lreads.longitude, lreads.altitude);
-  printf("Speed: %f\tHeading: %f\n\n", lreads.speed, lreads.heading);
+  printw("Speed: %f\tHeading: %f\n\n", lreads.speed, lreads.heading);
 }
 
+/** @brief Save sensor readings.
+ *  @author Caio Cotts
+ *  @date Feb 14 2022
+ *  @return 0 if data was saved successfuly
+ */
 int DlSaveLoggerData(reading_s creads) {
-  puts("Saving Logger Data\n");
+  printw("Saving Logger Data\n\n");
   return 0;
 }

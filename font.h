@@ -1,3 +1,9 @@
+/** @file font.h
+ *  @brief Fonsts used by the sensehat LED matrix.
+ *  @author Caio Cotts
+ *  @date Feb 14 2022
+ */
+
 typedef struct {
   char caractere;
   bool binarypattern[8][8];

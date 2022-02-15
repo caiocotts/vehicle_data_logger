@@ -3,9 +3,10 @@
  *  @date Jan 11 2022
  *  @brief Vehicle Data Logger main function
  */
-#include "vdl.h"
+
 #include "logger.h"
 #include <iostream>
+#include <ncurses.h>
 #include <unistd.h>
 using namespace std;
 
@@ -16,10 +17,16 @@ using namespace std;
  *
  */
 int main() {
+  initscr();
+  curs_set(0);
+
+  DlInitialization();
   while (true) {
+    move(0, 0);
     reading_s reads = DlGetLoggerReadings();
     DlDisplayLoggerReadings(reads);
     DlSaveLoggerData(reads);
-    sleep(5);
+    refresh();
+    sleep(2);
   }
 }

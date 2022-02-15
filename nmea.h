@@ -1,11 +1,11 @@
-#ifndef NMEA_H
-#define NMEA_H
 /** @file nmea.h
  *  @brief Constants, structures, function prototypes for NMEA functions
-*/
+ */
+#ifndef NMEA_H
+#define NMEA_H
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdint>
 
 #define _EMPTY 0x00
 #define NMEA_GPRMC 0x01
@@ -19,33 +19,32 @@
 #define NMEA_MESSAGE_ERR 0xC0
 #define NMEAMSGSZ 82
 
-typedef struct gpgga
-{
-	double utc;         ///< UTC Time
-    double latitude;    ///< Latitude eg: 4124.8963 (XXYY.ZZKK.. DEG, MIN, SEC.SS)
-    char lat;           ///< Latitude eg: N
-    double longitude;   ///< Longitude eg: 08151.6838 (XXXYY.ZZKK.. DEG, MIN, SEC.SS)
-    char lon;           ///< Longitude eg: W
-    uint8_t quality;    ///< Quality 0, 1, 2
-    uint8_t satellites; ///< Number of satellites: 1,2,3,4,5...
-    double altitude;    ///< Altitude eg: 280.2 (Meters above mean sea level)
+typedef struct gpgga {
+  double utc;      ///< UTC Time
+  double latitude; ///< Latitude eg: 4124.8963 (XXYY.ZZKK.. DEG, MIN, SEC.SS)
+  char lat;        ///< Latitude eg: N
+  double
+      longitude;   ///< Longitude eg: 08151.6838 (XXXYY.ZZKK.. DEG, MIN, SEC.SS)
+  char lon;        ///< Longitude eg: W
+  uint8_t quality; ///< Quality 0, 1, 2
+  uint8_t satellites; ///< Number of satellites: 1,2,3,4,5...
+  double altitude;    ///< Altitude eg: 280.2 (Meters above mean sea level)
 } gpgga_t;
 
-typedef struct gprmc
-{
-	double utc;         ///< UTC Time
-    double latitude;    ///< Latitude eg: 4124.8963 (XXYY.ZZKK.. DEG, MIN, SEC.SS)
-    char lat;           ///< Latitude eg: N
-    double longitude;   ///< Longitude eg: 08151.6838 (XXXYY.ZZKK.. DEG, MIN, SEC.SS)
-    char lon;           ///< Longitude eg: W
-    double speed;       ///< Speed
-    double course;      ///< Direction
-	double date;        ///< Date
+typedef struct gprmc {
+  double utc;      ///< UTC Time
+  double latitude; ///< Latitude eg: 4124.8963 (XXYY.ZZKK.. DEG, MIN, SEC.SS)
+  char lat;        ///< Latitude eg: N
+  double
+      longitude; ///< Longitude eg: 08151.6838 (XXXYY.ZZKK.. DEG, MIN, SEC.SS)
+  char lon;      ///< Longitude eg: W
+  double speed;  ///< Speed
+  double course; ///< Direction
+  double date;   ///< Date
 } gprmc_t;
 
-typedef struct nmeamsg
-{
-    char msgstr[NMEAMSGSZ+1];
+typedef struct nmeamsg {
+  char msgstr[NMEAMSGSZ + 1];
 } nmeamsg_s;
 
 ///\cond INTERNAL
