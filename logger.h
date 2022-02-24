@@ -32,6 +32,11 @@ using namespace std;
 #define SYSINFOBUSZ 512
 #define SENSEHAT 1
 #define IMUDELAY 200000
+#define HB 0x00E7
+#define HY 0xC4A0
+#define HW 0xFFFF
+#define LOGCOUNT 10
+#define SLEEPTIME 500000
 
 struct reading_s {
   time_t rtime;      ///< Reading time
@@ -61,4 +66,7 @@ uint64_t DlGetSerial(void);
 reading_s DlGetLoggerReadings(void);
 void DlDisplayLoggerReadings(reading_s lreads);
 int DlSaveLoggerData(reading_s creads);
+void DlDisplayLogo(void);
+void DlUpdateLevel(float xa, float ya);
+void interruptHandler();
 ///\endcond

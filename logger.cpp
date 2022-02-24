@@ -5,11 +5,14 @@
  */
 
 #include "logger.h"
+#include "cursesMatrix.h"
+#include "font.h"
 #include "sensehat.h"
 #include <fstream>
 #include <iostream>
 #include <ncurses.h>
 #include <regex>
+#include <signal.h>
 #include <string>
 
 // Global Objects
@@ -23,8 +26,15 @@ using namespace std;
  *  @return 0 if initialization successful.
  */
 int DlInitialization(void) {
-  printw("Caio Cotts' CENG252 Vehicle Data Logger\n");
-  printw("Data Logger Initialization\n\n");
+  mvprintw(0, 0, "Caio Cotts' CENG252 Vehicle Data Logger\n");
+  printw("Data Logger Initialization\n");
+  refresh();
+  for (int i = 0; i <= 30; i++) {
+    printw("#");
+    usleep(100000);
+    refresh();
+  }
+  cursDisplayPattern(0, 70, patterns[0]);
   return 0;
 }
 
@@ -108,7 +118,7 @@ void DlDisplayLoggerReadings(reading_s lreads) {
   printw("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fkPa\n", lreads.temperature,
          lreads.humidity, lreads.pressure);
   printw("Xa: %fg\t\tYa: %fg\t\tZa: %fg\n", lreads.xa, lreads.ya, lreads.za);
-  printw("Pitch: %f\tRoll: %f\t\tYaw: %f\n", lreads.pitch, lreads.roll,
+  printw("Pitch: %f \tRoll: %f\t\tYaw: %f\n", lreads.pitch, lreads.roll,
          lreads.yaw);
   printw("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
   printw("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
@@ -122,6 +132,39 @@ void DlDisplayLoggerReadings(reading_s lreads) {
  *  @return 0 if data was saved successfuly
  */
 int DlSaveLoggerData(reading_s creads) {
-  printw("Saving Logger Data\n\n");
+  mvprintw(15, 70, "Saving Logger Data...\n\n");
   return 0;
 }
+void DlDisplayLogo() {
+  uint16_t logo[8][8] = {
+      HB, HB, HB, HB, HB, HB, HB, HB, HB, HB, HW, HB, HB, HW, HB, HY,
+      HB, HB, HW, HB, HB, HW, HY, HY, HB, HB, HW, HB, HB, HW, HY, HY,
+      HB, HB, HW, HW, HW, HW, HY, HY, HB, HB, HW, HY, HY, HW, HY, HY,
+      HB, HY, HW, HY, HY, HW, HY, HY, HY, HY, HY, HY, HY, HY, HY, HY,
+  };
+  sh.WipeScreen();
+  sh.ViewPattern(logo);
+}
+void DlUpdateLevel(float xa, float ya) {
+  int x = (int)(ya * -30.0 + 4);
+  int y = (int)(xa * -30.0 + 4);
+  sh.WipeScreen();
+  if (x < 0) {
+    x = 0;
+  } else if (x > 6) {
+    x = 6;
+  }
+
+  if (y < 0) {
+    y = 0;
+  } else if (y > 6) {
+    y = 6;
+  }
+
+  sh.LightPixel(x, y, HY);
+  sh.LightPixel(x + 1, y, HY);
+  sh.LightPixel(x, y + 1, HY);
+  sh.LightPixel(x + 1, y + 1, HY);
+}
+
+void interruptHandler() {}

@@ -1,10 +1,10 @@
-vdl: vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o
-	c++ vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o -lm -lRTIMULib -lncurses -o vdl
+vdl: vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o cursesMatrix.o
+	c++ vdl.o logger.o serial.o nmea.o dlgps.o sensehat.o cursesMatrix.o -lm -lRTIMULib -lncurses -o vdl
 	
 vdl.o: vdl.cpp vdl.h logger.h serial.h nmea.h dlgps.h
 	c++ vdl.cpp -c
 
-logger.o: logger.cpp logger.h serial.h nmea.h dlgps.h sensehat.h
+logger.o: logger.cpp logger.h serial.h nmea.h dlgps.h sensehat.h font.h cursesMatrix.h
 	c++ logger.cpp -c
 
 serial.o: serial.cpp serial.h
@@ -18,6 +18,9 @@ nmea.o: nmea.cpp nmea.h
 
 sensehat.o: sensehat.cpp sensehat.h
 	c++ sensehat.cpp -c
+
+cursesMatrix.o: cursesMatrix.cpp cursesMatrix.h
+	c++ cursesMatrix.cpp -c	
 
 refman:
 	doxygen ceng252	
