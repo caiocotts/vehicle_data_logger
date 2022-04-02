@@ -20,6 +20,7 @@ using namespace std;
  */
 
 int main() {
+#if CURSE
   initscr();
   curs_set(0);
   start_color();
@@ -32,7 +33,14 @@ int main() {
   refresh();
   sleep(2);
   clear();
+#else
+  DlInitialization();
+  DlDisplayLogo();
+  sleep(5);
+#endif
   int tc = 0;
+
+#if CURSE
   while (true) {
     reading_s reads = DlGetLoggerReadings();
     DlDisplayLoggerReadings(reads);
@@ -51,4 +59,20 @@ int main() {
     refresh();
     sleep(0.5);
   }
+
+#else
+  while (true) {
+    reading_s reads = DlGetLoggerReadings();
+    DlDisplayLoggerReadings(reads);
+    DlUpdateLevel(reads.xa, reads.ya);
+    if (tc == LOGCOUNT) {
+      DlSaveLoggerData(reads);
+      tc = 0;
+      sleep(0.5);
+      continue;
+    }
+    tc++;
+    sleep(0.5);
+  }
+#endif
 }

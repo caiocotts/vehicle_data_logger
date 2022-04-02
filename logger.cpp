@@ -6,6 +6,7 @@
 
 #include "logger.h"
 #include "cursesMatrix.h"
+#include "dlgps.h"
 #include "font.h"
 #include "sensehat.h"
 #include <fstream>
@@ -26,6 +27,8 @@ using namespace std;
  *  @return 0 if initialization successful.
  */
 int DlInitialization(void) {
+
+#if CURSE
   mvprintw(0, 0, "Caio Cotts' CENG252 Vehicle Data Logger\n");
   printw("Data Logger Initialization\n");
   refresh();
@@ -36,6 +39,12 @@ int DlInitialization(void) {
   }
   cursDisplayPattern(0, 70, patterns[0]);
   return 0;
+#else
+  DlGpsInit();
+  cout << "Caio Cotts' CENG252 Vehicle Data Logger\n";
+  cout << "Data Logger Initialization\n\n";
+  return 0;
+#endif
 }
 
 /** @brief Get serial number of the Raspberry Pi.
@@ -65,6 +74,22 @@ uint64_t DlGetSerial(void) {
 reading_s DlGetLoggerReadings(void) {
   reading_s creads{0};
   creads.rtime = time(NULL);
+  loc_t gpsdata{0};
+
+#if GPSDEVICE
+  gpsdata = DlGpsLocation();
+  creads.latitude = gpsdata.latitude;
+  creads.longitude = gpsdata.longitude;
+  creads.altitude = gpsdata.altitude;
+  creads.speed = gpsdata.speed;
+
+#else
+  creads.latitude = DLAT;
+  creads.longitude = DLONG;
+  creads.altitude = DALT;
+  creads.speed = DSPEED;
+
+#endif
 
 #if SENSEHAT
   creads.temperature = sh.GetTemperature();
@@ -76,10 +101,6 @@ reading_s DlGetLoggerReadings(void) {
   usleep(IMUDELAY);
   sh.GetMagnetism(creads.xm, creads.ym, creads.zm);
   usleep(IMUDELAY);
-  creads.latitude = DLAT;
-  creads.longitude = DLONG;
-  creads.altitude = DALT;
-  creads.speed = DSPEED;
   creads.heading = DHEADING;
 
 #else
@@ -96,10 +117,6 @@ reading_s DlGetLoggerReadings(void) {
   creads.xm = DXM;
   creads.ym = DYM;
   creads.zm = DZM;
-  creads.latitude = DLAT;
-  creads.longitude = DLONG;
-  creads.altitude = DALT;
-  creads.speed = DSPEED;
   creads.heading = DHEADING;
 
 #endif
@@ -113,6 +130,7 @@ reading_s DlGetLoggerReadings(void) {
  *  @return void
  */
 void DlDisplayLoggerReadings(reading_s lreads) {
+#if CURSE
   printw("Unit: %Li", DlGetSerial());
   printw(" %s\n", ctime(&lreads.rtime));
   printw("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fkPa\n", lreads.temperature,
@@ -124,6 +142,21 @@ void DlDisplayLoggerReadings(reading_s lreads) {
   printw("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
          lreads.longitude, lreads.altitude);
   printw("Speed: %f\tHeading: %f\n\n", lreads.speed, lreads.heading);
+
+#else
+  cout << "Unit: " << DlGetSerial();
+  printf(" %s\n", ctime(&lreads.rtime));
+  printf("T: %.1fC\t\tH: %.0f%\t\t\tP: %.1fkPa\n", lreads.temperature,
+         lreads.humidity, lreads.pressure);
+  printf("Xa: %fg\t\tYa: %fg\t\tZa: %fg\n", lreads.xa, lreads.ya, lreads.za);
+  printf("Pitch: %f \tRoll: %f\t\tYaw: %f\n", lreads.pitch, lreads.roll,
+         lreads.yaw);
+  printf("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
+  printf("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
+         lreads.longitude, lreads.altitude);
+  printf("Speed: %f\tHeading: %f\n\n", lreads.speed, lreads.heading);
+
+#endif
 }
 
 /** @brief Save sensor readings.
@@ -132,7 +165,11 @@ void DlDisplayLoggerReadings(reading_s lreads) {
  *  @return 0 if data was saved successfuly
  */
 int DlSaveLoggerData(reading_s creads) {
+#if CURSE
   mvprintw(15, 70, "Saving Logger Data...\n\n");
+#else
+  puts("Saving Logger Data");
+#endif
   return 0;
 }
 void DlDisplayLogo() {

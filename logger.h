@@ -11,6 +11,7 @@
 using namespace std;
 
 // Default Logger Data Values
+#define CURSE 0
 #define DTEMP 24.6
 #define DHUMID 32
 #define DPRESS 1013.5
@@ -37,6 +38,7 @@ using namespace std;
 #define HW 0xFFFF
 #define LOGCOUNT 10
 #define SLEEPTIME 500000
+#define GPSDEVICE 1
 
 struct reading_s {
   time_t rtime;      ///< Reading time
