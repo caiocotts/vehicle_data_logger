@@ -29,6 +29,7 @@ using namespace std;
 int DlInitialization(void) {
 
 #if CURSE
+  DlGpsInit();
   mvprintw(0, 0, "Caio Cotts' CENG252 Vehicle Data Logger\n");
   printw("Data Logger Initialization\n");
   refresh();
@@ -141,7 +142,7 @@ void DlDisplayLoggerReadings(reading_s lreads) {
   printw("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
   printw("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
          lreads.longitude, lreads.altitude);
-  printw("Speed: %f\tHeading: %f\n\n", lreads.speed, lreads.heading);
+  printw("Speed: %f \tHeading: %f\n\n", lreads.speed, lreads.heading);
 
 #else
   cout << "Unit: " << DlGetSerial();
@@ -167,6 +168,52 @@ void DlDisplayLoggerReadings(reading_s lreads) {
 int DlSaveLoggerData(reading_s creads) {
 #if CURSE
   mvprintw(15, 70, "Saving Logger Data...\n\n");
+
+  FILE *fp;
+  char ltime[TIMESTRSZ];
+  char jsondata[PAYLOADSTRSZ];
+
+  fp = fopen("loggerdata.csv", "a");
+  if (fp == NULL) {
+    return 0;
+  }
+
+  strcpy(ltime, ctime(&creads.rtime));
+
+  int commaIndex[] = {3, 7, 10, 19};
+
+  for (int i : commaIndex) {
+    ltime[i] = ',';
+  }
+
+  fprintf(fp,
+          "%.24s,%3.1f,%3.0f,%3.1f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+          ltime, creads.temperature, creads.humidity, creads.pressure,
+          creads.xa, creads.ya, creads.za, creads.pitch, creads.roll,
+          creads.yaw, creads.xm, creads.ym, creads.zm, creads.latitude,
+          creads.longitude, creads.altitude, creads.speed, creads.heading);
+
+  fclose(fp);
+
+  sprintf(jsondata,
+          "{\n\t\"temperature\":%-3.1f,\n\t\"humidity\":%-3.0f,"
+          "\n\t\"pressure\":%-3.1f,\n\t\"xa\":%-f,\n\t\"ya\":%-f,\n\t\"za\":%-"
+          "f,\\n\t\"pitch\":%-f,\n\t\"roll\":%-f,\n\t\"yaw\":%-f,\n\t\"xm\":%-"
+          "f,\n\t\"ym\":%-f,\n\t\"zm\":%-f,\n\t\"latitude\":%-f,"
+          "\n\t\"longitude\":%-f,\n\t\"altitude\":%-f,\n\t\"speed\":%-f,"
+          "\n\t\"heading\":%-f,\n\t\"active\": true\n}",
+          creads.rtime, creads.temperature, creads.humidity, creads.pressure,
+          creads.xa, creads.ya, creads.za, creads.pitch, creads.roll,
+          creads.yaw, creads.xm, creads.ym, creads.zm, creads.latitude,
+          creads.longitude, creads.altitude, creads.speed, creads.heading);
+
+  fp = fopen("loggerdata.json", "w");
+  if (fp == NULL) {
+    return -1;
+  }
+
+  fprintf(fp, jsondata);
+  fclose(fp);
 #else
   FILE *fp;
   char ltime[TIMESTRSZ];
@@ -194,14 +241,17 @@ int DlSaveLoggerData(reading_s creads) {
 
   fclose(fp);
 
-  sprintf(
-      jsondata,
-      "{\"temperature\":%-3.1f,\"humidity\":%-3.0f,\"pressure\":%-3.1f,\"xa\":%-f,\"ya\":%-f,\"za\":%-f,\
-\"pitch\":%-f,\"roll\":%-f,\"yaw\":%-f,\"xm\":%-f,\"ym\":%-f,\"zm\":%-f,\"latitude\":%-f,\"longitude\":%-f,\"altitude\":%-f,\"speed\":%-f,\"heading\":%-f,\"active\": true}",
-      creads.rtime, creads.temperature, creads.humidity, creads.pressure,
-      creads.xa, creads.ya, creads.za, creads.pitch, creads.roll, creads.yaw,
-      creads.xm, creads.ym, creads.zm, creads.latitude, creads.longitude,
-      creads.altitude, creads.speed, creads.heading);
+  sprintf(jsondata,
+          "{\n\t\"temperature\":%-3.1f,\n\t\"humidity\":%-3.0f,"
+          "\n\t\"pressure\":%-3.1f,\n\t\"xa\":%-f,\n\t\"ya\":%-f,\n\t\"za\":%-"
+          "f,\\n\t\"pitch\":%-f,\n\t\"roll\":%-f,\n\t\"yaw\":%-f,\n\t\"xm\":%-"
+          "f,\n\t\"ym\":%-f,\n\t\"zm\":%-f,\n\t\"latitude\":%-f,"
+          "\n\t\"longitude\":%-f,\n\t\"altitude\":%-f,\n\t\"speed\":%-f,"
+          "\n\t\"heading\":%-f,\n\t\"active\": true\n}",
+          creads.rtime, creads.temperature, creads.humidity, creads.pressure,
+          creads.xa, creads.ya, creads.za, creads.pitch, creads.roll,
+          creads.yaw, creads.xm, creads.ym, creads.zm, creads.latitude,
+          creads.longitude, creads.altitude, creads.speed, creads.heading);
 
   fp = fopen("loggerdata.json", "w");
   if (fp == NULL) {

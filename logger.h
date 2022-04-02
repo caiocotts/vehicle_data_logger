@@ -11,7 +11,7 @@
 using namespace std;
 
 // Default Logger Data Values
-#define CURSE 0
+#define CURSE 1
 #define DTEMP 24.6
 #define DHUMID 32
 #define DPRESS 1013.5
