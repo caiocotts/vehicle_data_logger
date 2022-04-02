@@ -154,7 +154,7 @@ void DlDisplayLoggerReadings(reading_s lreads) {
   printf("Xm: %f\t\tYm: %f\t\tZm: %f\n", lreads.xm, lreads.ym, lreads.zm);
   printf("Latitude: %f\tLongitude: %f\tAltitude: %f\n", lreads.latitude,
          lreads.longitude, lreads.altitude);
-  printf("Speed: %f\tHeading: %f\n\n", lreads.speed, lreads.heading);
+  printf("Speed: %f \tHeading: %f\n\n", lreads.speed, lreads.heading);
 
 #endif
 }
@@ -168,9 +168,50 @@ int DlSaveLoggerData(reading_s creads) {
 #if CURSE
   mvprintw(15, 70, "Saving Logger Data...\n\n");
 #else
-  puts("Saving Logger Data");
+  FILE *fp;
+  char ltime[TIMESTRSZ];
+  char jsondata[PAYLOADSTRSZ];
+
+  fp = fopen("loggerdata.csv", "a");
+  if (fp == NULL) {
+    return 0;
+  }
+
+  strcpy(ltime, ctime(&creads.rtime));
+
+  int commaIndex[] = {3, 7, 10, 19};
+
+  for (int i : commaIndex) {
+    ltime[i] = ',';
+  }
+
+  fprintf(fp,
+          "%.24s,%3.1f,%3.0f,%3.1f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+          ltime, creads.temperature, creads.humidity, creads.pressure,
+          creads.xa, creads.ya, creads.za, creads.pitch, creads.roll,
+          creads.yaw, creads.xm, creads.ym, creads.zm, creads.latitude,
+          creads.longitude, creads.altitude, creads.speed, creads.heading);
+
+  fclose(fp);
+
+  sprintf(
+      jsondata,
+      "{\"temperature\":%-3.1f,\"humidity\":%-3.0f,\"pressure\":%-3.1f,\"xa\":%-f,\"ya\":%-f,\"za\":%-f,\
+\"pitch\":%-f,\"roll\":%-f,\"yaw\":%-f,\"xm\":%-f,\"ym\":%-f,\"zm\":%-f,\"latitude\":%-f,\"longitude\":%-f,\"altitude\":%-f,\"speed\":%-f,\"heading\":%-f,\"active\": true}",
+      creads.rtime, creads.temperature, creads.humidity, creads.pressure,
+      creads.xa, creads.ya, creads.za, creads.pitch, creads.roll, creads.yaw,
+      creads.xm, creads.ym, creads.zm, creads.latitude, creads.longitude,
+      creads.altitude, creads.speed, creads.heading);
+
+  fp = fopen("loggerdata.json", "w");
+  if (fp == NULL) {
+    return -1;
+  }
+
+  fprintf(fp, jsondata);
+  fclose(fp);
 #endif
-  return 0;
+  return 1;
 }
 void DlDisplayLogo() {
   uint16_t logo[8][8] = {

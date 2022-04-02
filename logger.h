@@ -39,6 +39,8 @@ using namespace std;
 #define LOGCOUNT 10
 #define SLEEPTIME 500000
 #define GPSDEVICE 1
+#define TIMESTRSZ 25
+#define PAYLOADSTRSZ 400
 
 struct reading_s {
   time_t rtime;      ///< Reading time

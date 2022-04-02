@@ -3,3 +3,5 @@
 vdl
 rtf
 .editorconfig
+*.json
+*.csv
